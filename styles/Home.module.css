@@ -1,0 +1,188 @@
+.container {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.15) 100%), radial-gradient(at top center, rgba(255,255,255,0.40) 0%, rgba(0,0,0,0.40) 120%) #989898;
+  background-blend-mode: multiply,multiply;
+  font-family: 'Black Ops One', cursive;
+  
+}
+
+.main {
+  min-height: 100vh;
+  padding: 4rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer {
+  display: flex;
+  flex: 1;
+  padding: 2rem 0;
+  border-top: 2px solid #eaeaea;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.title a {
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.title a:hover,
+.title a:focus,
+.title a:active {
+  text-decoration: underline;
+}
+
+.title {
+  margin: 0;
+  line-height: 1.15;
+  font-size: 4rem;
+}
+
+.title,
+.description {
+  text-align: center;
+}
+
+.description {
+  margin: 4rem 0;
+  line-height: 1.5;
+  font-size: 1.5rem;
+}
+
+.grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 800px;
+}
+
+.card {
+  margin: 1rem;
+  padding: 1.5rem;
+  text-align: left;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  max-width: 335px;
+  box-shadow: 0px 2px 5px 2px rgba(255,255,255,255);
+}
+
+.card:hover,
+.card:focus,
+.card:active {
+  color: #0f58aa;
+  border-color: #0f58aa;
+  box-shadow: 0px 2px 5px 2px #0f58aa;
+  cursor: pointer;
+}
+
+.card h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.card p {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .grid {
+    width: 100%;
+    flex-direction: column;
+  }
+}
+
+/**************************
+****** page/index.js ******
+***************************/
+
+.mathtoolContainer {
+  background-image: linear-gradient(to top, #464397 0%, #5555a7 52%, #6c6cb8 100%);
+  font-family: 'Black Ops One', cursive;
+}
+
+.resultBackground {
+  background-color: rgba(17, 16, 16, 0.5);
+  border: 2px solid rgba(17, 16, 16, 1);
+  border-radius: 20px;
+  box-shadow: 0px 2px 5px 2px rgba(17, 16, 16, 0.7);
+}
+
+.headerBackground {
+  background-color: #989898;
+  border: 1px solid rgba(17, 16, 16, 0.7);
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px 2px rgba(17, 16, 16, 0.7);
+}
+
+.textFieldBackground {
+  background-color: white;
+  border: 1px solid rgba(17, 16, 16, 0.7);
+  border-radius: 10px;
+  box-shadow: 0px 2px 5px 2px rgba(17, 16, 16, 0.7);
+}
+
+.outputContainer {
+  overflow-y: scroll;
+}
+
+.outputContainer::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.outputContainer::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: rgb(230, 141, 156);
+}
+
+.outputContainer::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background-color: black;
+}
+
+/**************************
+**** page/mtoolPage.js ****
+***************************/
+
+.cctoolContainer {
+  background-image: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
+  font-family: 'Black Ops One', cursive;
+}
+
+/**************************
+**** page/cctoolPage.js ***
+***************************/
+
+.btoolContainer {
+  background-image: linear-gradient(-20deg, #f794a4 0%, #fdd6bd 100%);
+  font-family: 'Black Ops One', cursive;
+}
+
+/**************************
+**** page/btoolPage.js ****
+***************************/
+
+.fsContainer {
+  background-image: linear-gradient(to top, #d19c56 0%, #e2bf8d 100%);
+  font-family: 'Black Ops One', cursive;
+}
+
+/**************************
+** page/fileSystemPage.js *
+***************************/
