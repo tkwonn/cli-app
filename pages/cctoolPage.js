@@ -10,7 +10,6 @@ import {ConfigCCTools} from '../config/cctools'
 const CCToolPage = () => {
   const [input, setInput] = useState({value: ''});
   const [resArr, setResArr] = useState([]);
-  const access_key = '270bd7cf39532020b79e9304f7ffa16d';
 
   useEffect(() => {
     const scrollArea = document.getElementById('scroll-area');
@@ -33,29 +32,6 @@ const CCToolPage = () => {
       else {
         evaluatedResultsStringFromParsedArray(parsedStringInputArray);
       }
-    }
-  }
-
-  async function getAPIData(parsedStringArray){
-    let queryResponseObject = {};
-    let queryURL = 'http://api.exchangeratesapi.io/v1/latest?access_key=' + access_key + '&symbols=AED,GBP,INR,JPY,KRW,USD,CAD,CNY,NZD';
-
-    await fetch(queryURL).then(response=>response.json()).then(data=>queryResponseObject = data);
-    console.log(parsedStringArray);
-    console.log(queryResponseObject);
-    
-    if(parsedStringArray[1] == "showCurrentRate"){
-      let targetCurrency = parsedStringArray[2];
-      let res = queryResponseObject["rates"][targetCurrency].toString();
-      appendResult(true, res);
-    }
-    else if(parsedStringArray[1] == "convert"){
-      let targetCurrency = parsedStringArray[3];
-      let rateNum = queryResponseObject["rates"][targetCurrency];
-      let res = Number(parsedStringArray[2]) * rateNum;
-      // 小数点第三位で切り捨て
-      res = Math.floor(res*100)/100;
-      appendResult(true, res.toString());
     }
   }
 
@@ -111,7 +87,7 @@ const CCToolPage = () => {
 
     if(ConfigCCTools.zeroArgumentCommand.includes(commandArgsArray[0])) return zeroArgValidator(commandArgsArray.slice(1), commandArgsArray);
     if(ConfigCCTools.singleArgumentCommand.includes(commandArgsArray[0])) return singleArgValidator(commandArgsArray.slice(1), commandArgsArray);
-    if(ConfigCCTools.doubleArgumentsCommand.includes(commandArgsArray[0])) return doubleArgValidator(commandArgsArray.slice(1), commandArgsArray);
+    if(ConfigCCTools.tripleArgumentsCommand.includes(commandArgsArray[0])) return tripleArgValidator(commandArgsArray.slice(1), commandArgsArray);
   }
 
   /**
@@ -127,9 +103,12 @@ const CCToolPage = () => {
    */
   const singleArgValidator = (argsArray, commandArgsArray) => {
     if(argsArray.length != 1) return {'isValid': false, 'errorMessage': "Command " + commandArgsArray[0] + " requires exactly 1 argument"};
-    if(!ConfigCCTools.validDenominationList.includes(argsArray[0])) {
-      const validDenomination = ConfigCCTools.validDenominationList.join(",");
-      return {'isValid': false, 'errorMessage': "CCTools only supports the following currencies: " + validDenomination};
+    let validLocalesList = [];
+    ConfigCCTools.validCurrencyList.forEach(element => {
+      if(!validLocalesList.includes(element.locale)) validLocalesList.push(element.locale);
+    })
+    if(!validLocalesList.includes(argsArray[0])) {
+      return {'isValid': false, 'errorMessage': "CCTools only supports the following currencies: " + validLocalesList.join(" ")};
     }
 
     return {'isValid': true, 'errorMessage': ''};
@@ -138,12 +117,17 @@ const CCToolPage = () => {
   /**
    *  @rules Requires 3 arguments, limited denominations, and second argument must be a positive number
    */
-  const doubleArgValidator = (argsArray, commandArgsArray) => {
+  const tripleArgValidator = (argsArray, commandArgsArray) => {
     console.log(argsArray, commandArgsArray);
-    if(argsArray.length != 2) return {'isValid': false, 'errorMessage': "Command " + commandArgsArray[0] + " requires exactly 2 arguments, i.e., [Amount] [Currency I want]"};
-    if(!ConfigCCTools.validDenominationList.includes(argsArray[1])) return {'isValid': false, 'errorMessage': "This currency is not supported"};
+    if(argsArray.length != 3) return {'isValid': false, 'errorMessage': "Command " + commandArgsArray[0] + " requires exactly 3 arguments. [Currency I have] [Amount] [Currency I want]"};
+    let validDenominationsList = [];
+    ConfigCCTools.validCurrencyList.forEach(element => {
+      if(!validDenominationsList.includes(element.denomination)) validDenominationsList.push(element.denomination);
+    })
+    if(!validDenominationsList.includes(argsArray[0])) return {'isValid': false, 'errorMessage': "This 1st currency is not supported"};
+    if(!validDenominationsList.includes(argsArray[2])) return {'isValid': false, 'errorMessage': "This 2nd currency is not supported"};
     
-    let parsedNum = Number(argsArray[0]);
+    let parsedNum = Number(argsArray[1]);
     if((typeof parsedNum !== "number") || isNaN(parsedNum) || parsedNum <= 0) return {'isValid': false, 'errorMessage': "Amount must be a positive number"} 
 
     return {'isValid': true, 'errorMessage': ''}
@@ -154,18 +138,42 @@ const CCToolPage = () => {
    * @return {string} 計算結果
    */
   const evaluatedResultsStringFromParsedArray = (stringArray) => {
-    if(stringArray[1] == "showAvailableCurrencies") addAvialableCurrencyToResult();
-    else if(stringArray[1] == "showCurrentRate") getAPIData(stringArray);
-    else if(stringArray[1] == "convert") getAPIData(stringArray);
+    if(stringArray[1] == "showAvailableLocales") addAvialableLocaleToResult();
+    else if(stringArray[1] == "showDenominations") showDenominationsToResult(stringArray[2]);
+    else if(stringArray[1] == "convert") addConversionToResult(stringArray[2], stringArray[3], stringArray[4]);
     else console.log("evaluatedResultsStringFromParsedArray: invalid input");
 
     return;
   }
 
-  const addAvialableCurrencyToResult = () => {
-    let output = (<div><p>AED (UAE Dirham)</p><p>GBP (United Kingdom Pound Sterling)</p><p>INR (Indian Rupee)</p><p>JPY (Japanese Yen)</p><p>KRW (South Korean Won)</p><p>USD (United State Dollar)</p><p>CAD (Canadian Dollar)</p><p>CNY (Chinese Renminbi)</p><p>NZD (New Zealand Dollar)</p></div>);
-    appendResult(true, output);
+  const addAvialableLocaleToResult = () => {
+    let output = [];
+    ConfigCCTools.validCurrencyList.forEach(element => {
+      if(!output.includes(element.locale)) output.push(element.locale);
+    })
+    appendResult(true, output.join(" "));
     return;
+  }
+
+  const showDenominationsToResult = (locale) => {
+    let output = [];
+    ConfigCCTools.validCurrencyList.forEach(element => {
+      if(element.locale == locale) output.push(element.denomination);
+    })
+    appendResult(true, output.join(", "));
+    return;
+  }
+
+  const addConversionToResult = (sourceCurrency, amount, destinationCurrency) => {
+    console.log(sourceCurrency, amount, destinationCurrency);
+    let sourceRate;
+    let destinationRate;
+    ConfigCCTools.validCurrencyList.forEach(element => {
+      if(element.denomination === sourceCurrency) sourceRate = element.exchangeRateJPY;
+      if(element.denomination === destinationCurrency) destinationRate = element.exchangeRateJPY;
+    })
+    let result = Math.floor((sourceRate * Number(amount)) * 100 / destinationRate) / 100;
+    appendResult(true, result + " " + destinationCurrency);
   }
 
   const appendResult = (isValid, output) => {
@@ -200,8 +208,7 @@ const CCToolPage = () => {
         <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Spartan:wght@500&display=swap" rel="stylesheet" />
       </Head>
       <div>
-        <h1 style={{ textAlign: "center", marginBottom: "0.8rem", marginTop: "0px" }}>Currency Convert</h1>
-        <p style={{ textAlign: "center", color: "red", marginBottom: "2rem" }}>Only EUR is supported as a base currency</p>
+        <h1 style={{ textAlign: "center", marginBottom: "2.5rem", marginTop: "0px" }}>Currency Convert</h1>
       </div>
       <Container maxWidth="md" style={{ padding: "0px" }} className={styles.resultBackground}>
 
@@ -209,8 +216,8 @@ const CCToolPage = () => {
         <div style={{ textAlign: "center", padding: "0.5rem" }} className={styles.headerBackground}>
           <h3 style={{ textAlign: "center"}}>Format: CCTools [command] (optional argument)</h3>
           <h3 style={{ textAlign: "center" }}>~ List of available commands ~</h3>
-          <p>showAvailableCurrencies, showCurrentRate [Currency I want], convert [amount] [Currency I want]</p>
-          <h5>Example: CCTools showAvailableCurrencies <span style={{ color: "white", margin: "0rem 0.5rem" }}> |</span>CCTools showCurrentRate USD<span style={{ color: "white", margin: "0rem 0.5rem" }}> |</span>CCTools convert 100 USD</h5>
+          <p>showAvailableLocales, showDenominations [locale], convert [Currency I have] [amount] [Currency I want]</p>
+          <h5>Example: CCTools showAvailableLocales <span style={{ color: "white", margin: "0rem 0.5rem" }}> |</span>CCTools showDenominations India<span style={{ color: "white", margin: "0rem 0.5rem" }}> |</span>CCTools convert Rupee 100 Dollar</h5>
         </div>
 
         {/* 2nd section */}

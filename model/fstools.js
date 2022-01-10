@@ -164,8 +164,8 @@ export class FileSystem {
           </tr>
           <tr>
             <td style={{ textAlign: "center" }}>cd</td>
-            <td style={{ textAlign: "center" }}>touch [fileName]</td>
-            <td style={{ textAlign: "center" }}>Change current working directory</td>
+            <td style={{ textAlign: "center" }}>cd [directoryName], cd [directoryName/directoryName] or cd ..</td>
+            <td style={{ textAlign: "center" }}>Change current working directory to specified directory or Change current working directory to parent directory</td>
           </tr>
           <tr>
             <td style={{ textAlign: "center" }}>pwd</td>
